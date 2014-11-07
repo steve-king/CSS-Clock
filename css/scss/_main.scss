@@ -1,0 +1,470 @@
+body {
+	background:#333;
+	overflow:hidden;
+}
+
+a {
+	color:#fff;
+	text-decoration:none;
+	
+	&:hover {
+		text-decoration:underline;
+	}
+}
+
+.container {
+	width:180px;
+	height:180px;
+	margin:100px auto;
+	overflow:visible;
+}
+
+.menu {
+	position:relative;
+	z-index:1;
+	margin:0;
+	padding:0;
+	margin-top:60px;
+	text-align:center;
+	
+	li {
+		display:inline-block;
+		margin:0 20px;
+	}
+}
+
+#clock {
+
+	
+	$size : 100%;
+	width:$size;
+	height:$size;
+	@include border-radius($size);
+	box-sizing:border-box;
+	
+	margin:0 auto;
+	position:relative;
+	
+	background:$clock_bg;
+	
+	border:2px solid #363c48;
+		
+	background: #f4f4f4;
+	background: -moz-radial-gradient(center, ellipse cover,  #f4f4f4 0%, #c3cad2 79%, #97a5ae 100%);
+	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#f4f4f4), color-stop(79%,#c3cad2), color-stop(100%,#97a5ae));
+	background: -webkit-radial-gradient(center, ellipse cover,  #f4f4f4 0%,#c3cad2 79%,#97a5ae 100%);
+	background: -o-radial-gradient(center, ellipse cover,  #f4f4f4 0%,#c3cad2 79%,#97a5ae 100%);
+	background: -ms-radial-gradient(center, ellipse cover,  #f4f4f4 0%,#c3cad2 79%,#97a5ae 100%);
+	background: radial-gradient(ellipse at center,  #f4f4f4 0%,#c3cad2 79%,#97a5ae 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f4f4f4', endColorstr='#97a5ae',GradientType=1 );
+
+	&:before {
+		box-sizing:border-box;
+		content:"";
+		position:absolute;
+		top:-5%;
+		left:-5%;
+		width:110%;
+		height:110%;
+		background:darken(#dee2e5, 10%);
+		border:4px solid #000;
+		@include border-radius(50%);
+		z-index:-1;
+	}
+	
+	&:after {
+		box-sizing:border-box;
+		content:"";
+		position:absolute;
+		width:100%;
+		height:100%;
+		top:0;
+		left:0;
+		@include border-radius(50%);
+	}
+}
+
+
+/* 	MARKERS
+----------------------------------------
+ - 30 divs are needed to create 60 markers
+ - Each one is a rectangle equal to the diameter of the clock face
+ - Use :before and :after to "colour in" the ends of each rectangle, leaving the actual div background transparent.
+ - CSS Rotate each marker as needed
+---------------------------------------- */
+.markers {
+
+	width:100%;
+	height:100%;
+	
+	> div {
+		
+		position:absolute;
+		top:0;
+		left:0;
+		width:100%;
+		height:100%;
+		
+		$marker_padding:2%;
+		
+		/* Set "padding" from edge of the clock face */
+		&:before {
+			top:$marker_padding;
+		}
+		
+		&:after {
+			bottom:$marker_padding;
+		}
+		
+		/* Basic marker colour/position */
+		&:before, &:after {
+			content: "";
+			background:$marker_bg;
+			position:absolute;
+			left:50%;
+			
+			/* Minute marker style */
+			$width:1%;
+			width:$width;
+			height:4%;
+			margin-left:-($width/2);
+		} 
+		
+		/* Every 5th marker is an hour marker */
+		&:nth-child(5n){
+			&:before, &:after {
+			
+				$width:3%;
+				width:$width;
+				height:12%;
+				margin-left:-($width/2);
+			}	
+		}
+						
+		/* Loop through the markers and apply required rotation ($i * 6 degrees) */
+		$num_markers : 30;
+		@for $i from 1 through $num_markers {
+			
+			&:nth-child( #{$i} ){
+				$rotate : $i * 6deg;
+				@include rotate($rotate);
+				
+			}
+		}
+		
+	}
+}
+
+/* 	HANDS
+---------------------------------------- 
+ - Much the same principal as the markers
+ - Hand div is 100% width/height of the clock
+ - the :before pseudoelement is the bit that's coloured in black/red
+ - the :after element on the second hand makes up the large red circle on the end of it
+---------------------------------------- */
+.hand_hour, .hand_min, .hand_sec {
+	
+	-webkit-transform:translateZ(0);
+	display:none;
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	
+	div {
+		width:100%;
+		height:100%;
+		
+		&:before {
+			content:"";
+			position:absolute;
+			left:50%;
+			background:$hand_bg;
+			bottom:35%;
+		}
+		
+		&:after {
+			content:"";
+		}
+	}
+}
+
+.hand_hour, .hand_min {
+
+	.rotator { 
+		&:before {
+			@include box-shadow(inset 0px 0px 10px rgba(255,255,255,0.2));		
+		}
+	}	
+}
+
+.hand_hour {
+		
+	.rotator {
+				
+		&:before {
+			$size:4%;
+			width:$size;
+			margin-left:-($size / 2);
+			height:40%;
+		}
+	}
+}
+
+.hand_min {
+		
+	.rotator {
+		
+		&:before {
+			$size:3%;
+			width:$size;
+			margin-left:-($size / 2);
+			height:57%;		
+		}
+	}
+}
+
+.hand_sec {
+		
+	.rotator {
+		
+		.ticker {
+			
+			&:before {
+				background:$hand_sec_bg;
+				$size:1%;
+				width:$size;
+				margin-left:-($size / 2);
+				height:45%;
+			}
+			
+			/* Large red circle on end of hand */
+			&:after {
+				position:absolute;
+				left:50%;
+				$size:8%;
+				margin-left: -($size / 2);
+				top:15.5%;
+				width:$size;
+				height:$size;
+				
+				@include border-radius(50%);
+				
+				background:$hand_sec_bg;
+			}
+			/* Center circle */
+			span {
+				$size:2.5%;
+				width:$size;
+				height:$size;
+				position:absolute;
+				top:50%;
+				left:50%;
+				margin-left:-($size/2);
+				margin-top:-($size/2);
+				background:$hand_sec_bg;
+				@include border-radius(50%);
+			}
+			
+			&:before, &:after, span {
+				@include box-shadow(inset 0px 0px 5px rgba(255,255,255,0.4));
+			}
+			
+		}
+		
+		
+	}
+
+}
+
+.pin {
+	$size:1.4%;
+	width:$size;
+	height:$size;
+	position:absolute;
+	top:50%;
+	left:50%;
+	margin-left:-($size/2);
+	margin-top:-($size/2);
+	background:#b1a7a6;
+	@include border-radius(50%);
+	
+	&:after {
+		content:"";
+		position:absolute;
+		top:50%;
+		left:50%;
+		$size:50%;
+		width:$size;
+		height:$size;
+		margin-left:-($size/2);
+		margin-top:-($size/2);
+		background:#000;
+		@include border-radius(50%);
+	}
+}
+
+
+/* 	ANIMATION STUFF
+---------------------------------------- */
+#clock {
+	
+	.hand_hour {
+		
+		.rotator {
+			@include animation(0, 43200s, rotation);
+			-webkit-animation-play-state:paused;
+		}
+	}
+	
+	.hand_min {
+		
+		.rotator {
+			@include animation(0, 3600s, rotation);
+			-webkit-animation-play-state:paused;
+		}
+	}
+	
+	.hand_sec {
+		
+		.rotator {
+		
+			@include animation(0, 60s, rotation);
+			-webkit-animation-play-state:paused;
+			
+			.ticker {
+				@include animation(0, 1s, tick);
+				-webkit-animation-play-state:paused;
+			}
+		}
+	}
+}
+
+#clock.is_running {
+	.hand_hour {
+		
+		.rotator {
+			-webkit-animation-play-state:running;
+		}
+	}
+	
+	.hand_min {
+		
+		.rotator {
+			-webkit-animation-play-state:running;
+		}
+	}
+	
+	.hand_sec {
+		
+		.rotator {
+		
+			-webkit-animation-play-state:running;
+			
+			.ticker {
+				-webkit-animation-play-state:running;
+			}
+		}
+	}
+}
+
+#clock.is_paused {
+	.hand_hour {
+		
+		.rotator {
+			@include removeAnimation;
+		}
+	}
+	
+	.hand_min {
+		
+		.rotator {
+			@include removeAnimation;
+		}
+	}
+	
+	.hand_sec {
+		
+		.rotator {
+		
+			@include removeAnimation;
+			
+			.ticker {
+				@include removeAnimation;
+			}
+		}
+	}
+
+}
+
+
+/* Basic rotation */
+@include keyframe (rotation) {
+	
+	0% {
+		@include rotate(0deg);
+	}
+ 
+	100% {
+		@include rotate(360deg);
+	}
+}
+
+
+/* Ticking animation */
+@include keyframe (tick) {
+	
+	0% {
+		@include rotate(0deg);
+	}
+	
+	90% {
+		@include rotate(-5.7deg);
+	}
+	
+	95% {
+		@include rotate(2deg);
+	}
+	
+	98% {
+		@include rotate(-1deg);
+	}
+	
+	100% {
+		@include rotate (0deg);
+	}
+	
+}
+
+
+
+/* ==========================================================================
+   Media Queries
+   ========================================================================== */
+
+@media only screen and (min-width: 480px) {
+
+	.container {
+		width:260px;
+		height:260px;
+		margin:60px auto;
+	}
+}
+
+@media only screen and (min-width: 768px) {
+	.container {
+		width:500px;
+		height:500px;
+		margin:100px auto;
+	}
+}
+
+@media only screen and (min-width: 1140px) {
+
+	.container {
+		width: 700px;
+		height:700px;
+	}
+}
+
